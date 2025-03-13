@@ -7,7 +7,6 @@ import (
     max30102 "APIs/src/max30102/infraestructure/routes"
     mpu6050 "APIs/src/mpu6050/infraestructure/routes"
     ds18b20c "APIs/src/ds18b20/infraestructure/controllers"
-    max30102c "APIs/src/max30102/infraestructure/controllers"
     mpu6050c "APIs/src/mpu6050/infraestructure/controllers"
     ds18b20s "APIs/src/ds18b20/application"
     max30102s "APIs/src/max30102/application"
@@ -48,12 +47,11 @@ func main() {
 
     // Inicialización de controladores
     ds18b20Ctrl := ds18b20c.NewDS18B20Controller(ds18b20Service)
-    max30102Ctrl := max30102c.NewMax30102Controller(max30102Service)
     mpu6050Ctrl := mpu6050c.NewMpu6050Controller(mpu6050Service)
 
     // Configurar las rutas para cada módulo
     ds18b20.DS18B20Routes(r, ds18b20Ctrl)
-    max30102.Max30102Routes(r, max30102Ctrl)
+    max30102.Max30102Routes(r, max30102Service)
     mpu6050.MPU6050Routes(r, mpu6050Ctrl)
 
     // Iniciar el servidor en el puerto 8080
