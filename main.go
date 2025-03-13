@@ -23,32 +23,41 @@ func main() {
     // Cargar variables de entorno desde el archivo .env
     err := godotenv.Load()
     if err != nil {
-        log.Fatal("Error loading .env file")
+        log.Fatal("Error cargando el archivo .env")
     }
 
     // Inicializar la conexión a la base de datos
     database, err := db.InitDB()
+    if err != nil {
+        log.Fatal("Error al inicializar la base de datos: ", err)
+    }
     defer db.CloseDB(database)
 
     // Crear un enrutador Gin
     r := gin.Default()
 
-    max30102Repo := max30102r.NewMax30102RepositoryPostgres(database)
-    mpu6050Repo := mpu6050r.NewMPU6050RepositoryPostgres(database)
-    ds18b20Repo := ds18b20r.NewDS18B20RepositoryPostgres(database)
+    // Inicialización de repositorios
+    max30102Repo := max30102r.NewMax30102RepositoryMySQL(database)
+    mpu6050Repo := mpu6050r.NewMPU6050RepositoryMySQL(database)
+    ds18b20Repo := ds18b20r.NewDS18B20RepositoryMySQL(database)
 
+    // Inicialización de servicios
     ds18b20Service := ds18b20s.NewDS18B20Service(ds18b20Repo)
     max30102Service := max30102s.NewMax30102Service(max30102Repo)
     mpu6050Service := mpu6050s.NewMpu6050Service(mpu6050Repo)
 
+    // Inicialización de controladores
     ds18b20Ctrl := ds18b20c.NewDS18B20Controller(ds18b20Service)
     max30102Ctrl := max30102c.NewMax30102Controller(max30102Service)
     mpu6050Ctrl := mpu6050c.NewMpu6050Controller(mpu6050Service)
+
     // Configurar las rutas para cada módulo
     ds18b20.DS18B20Routes(r, ds18b20Ctrl)
-    max30102.Max30102hRoutes(r, max30102Ctrl)
+    max30102.Max30102Routes(r, max30102Ctrl)
     mpu6050.MPU6050Routes(r, mpu6050Ctrl)
 
     // Iniciar el servidor en el puerto 8080
-    r.Run(":8080")
+    if err := r.Run(":8080"); err != nil {
+        log.Fatalf("Error al iniciar el servidor: %v", err)
+    }
 }
