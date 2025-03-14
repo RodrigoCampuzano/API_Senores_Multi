@@ -1,21 +1,23 @@
 package main
 
 import (
-    "log"
-    "APIs/src/core/db"
-    ds18b20 "APIs/src/ds18b20/infraestructure/routes"
-    max30102 "APIs/src/max30102/infraestructure/routes"
-    mpu6050 "APIs/src/mpu6050/infraestructure/routes"
-    ds18b20c "APIs/src/ds18b20/infraestructure/controllers"
-    mpu6050c "APIs/src/mpu6050/infraestructure/controllers"
-    ds18b20s "APIs/src/ds18b20/application"
-    max30102s "APIs/src/max30102/application"
-    mpu6050s "APIs/src/mpu6050/application"
-    mpu6050r "APIs/src/mpu6050/infraestructure/repositories"
-    max30102r "APIs/src/max30102/infraestructure/repositories"
-    ds18b20r "APIs/src/ds18b20/infraestructure/repositories"
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
+	"APIs/src/core/db"
+	"APIs/src/core/middleware"
+	"log"
+	ds18b20s "APIs/src/ds18b20/application"
+	ds18b20c "APIs/src/ds18b20/infraestructure/controllers"
+	ds18b20r "APIs/src/ds18b20/infraestructure/repositories"
+	ds18b20 "APIs/src/ds18b20/infraestructure/routes"
+	max30102s "APIs/src/max30102/application"
+	max30102r "APIs/src/max30102/infraestructure/repositories"
+	max30102 "APIs/src/max30102/infraestructure/routes"
+	mpu6050s "APIs/src/mpu6050/application"
+	mpu6050c "APIs/src/mpu6050/infraestructure/controllers"
+	mpu6050r "APIs/src/mpu6050/infraestructure/repositories"
+	mpu6050 "APIs/src/mpu6050/infraestructure/routes"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -34,6 +36,8 @@ func main() {
 
     // Crear un enrutador Gin
     r := gin.Default()
+    
+    r.Use(middleware.MiddlewareCORS())
 
     // Inicialización de repositorios
     max30102Repo := max30102r.NewMax30102RepositoryMySQL(database)
@@ -55,7 +59,7 @@ func main() {
     mpu6050.MPU6050Routes(r, mpu6050Ctrl)
 
     // Iniciar el servidor en el puerto 8080
-    if err := r.Run(":8080"); err != nil {
+    if err := r.Run(":8081"); err != nil {
         log.Fatalf("Error al iniciar el servidor: %v", err)
     }
 }
