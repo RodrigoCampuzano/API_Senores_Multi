@@ -15,7 +15,7 @@ func NewMax30102UseCase ( max30102Repo repositories.Max30102Repository ) *Create
     }
 }
 
-func (s *CreateMax30102UseCase ) SaveMax30102Data(data *entities.Max30102) error {
+func (s *CreateMax30102UseCase ) Run(data *entities.Max30102) error {
     return s.max30102Repo.Save(data)
 }
 

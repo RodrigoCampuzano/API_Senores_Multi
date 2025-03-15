@@ -1,4 +1,4 @@
-package entities
+package ds_entities
 
 import "time"
 
