@@ -1,38 +1,49 @@
 package controllers
 
 import (
-    "net/http"
-    "APIs/src/max30102/application"
-    "APIs/src/max30102/domain/entities"
-    "github.com/gin-gonic/gin"
+	"APIs/src/max30102/application"
+	"APIs/src/max30102/domain/entities"
+	"APIs/src/max30102/infraestructure/broker"
+	"encoding/json"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-type Max30102Controller struct {
-    max30102Service *application.Max30102Service
+type CreateMax30102Controller struct {
+	createUseCase *application.CreateMax30102UseCase
+	publisher     *broker.RabbitMQPublisher
 }
 
-func NewMax30102Controller(max30102Service *application.Max30102Service) *Max30102Controller {
-    return &Max30102Controller{max30102Service: max30102Service}
+func NewMax30102Controller(max30102Service *application.CreateMax30102UseCase, publisher *broker.RabbitMQPublisher) *CreateMax30102Controller {
+	return &CreateMax30102Controller{createUseCase: max30102Service, publisher: publisher}
 }
 
-func (c *Max30102Controller) SaveMax30102Data(ctx *gin.Context) {
-    var data entities.Max30102
-    if err := ctx.ShouldBindJSON(&data); err != nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-    }
-    if err := c.max30102Service.SaveMax30102Data(&data); err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-    ctx.JSON(http.StatusOK, gin.H{"message": "Data saved"})
-}
+func (c *CreateMax30102Controller) SaveMax30102Data(ctx *gin.Context) {
+	var data *entities.Max30102
+	if err := ctx.ShouldBindJSON(&data); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := c.createUseCase.Run(data); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	message := map[string]interface{}{
+		"bpm":  data.BPM,
+		"spo2": data.SpO2,
+	}
 
-func (c *Max30102Controller) GetMax30102Data(ctx *gin.Context) {
-    data, err := c.max30102Service.GetMax30102Data()
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-    ctx.JSON(http.StatusOK, gin.H{"data": data})
+	messageBytes, err := json.Marshal(message)
+	if err != nil {
+		log.Println("Error al serializar el mensaje:", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error al procesar el mensaje"})
+		return
+	}
+	err = c.publisher.Publish(messageBytes)
+	if err != nil {
+		log.Println("Error publicando mensaje en RabbitMQ:", err)
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Data saved"})
 }
