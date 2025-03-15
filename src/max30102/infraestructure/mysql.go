@@ -32,7 +32,7 @@ func (mysql *MySQL) Save(data *entities.Max30102) error {
 		log.Println("Error obteniendo el ID del nuevo dato:", err)
 		return err
 	}
-	fmt.Println("✅ Nuevo dato almacenado con ID:", lastID)
+	fmt.Println("Nuevo dato almacenado con ID:", lastID)
 	return nil
 }
 
