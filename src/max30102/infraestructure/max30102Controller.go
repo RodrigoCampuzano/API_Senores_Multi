@@ -16,9 +16,8 @@ type ProductController struct {
 func NewProductController(
 	createUseCase *application.CreateMax30102UseCase,
 	viewUseCase *application.GetAll30102UseCase,
-	publisher *broker.RabbitMQPublisher, // 🔹 Se agrega el publisher de RabbitMQ
+	publisher *broker.RabbitMQPublisher,
 ) *ProductController {
-	// 🔹 Se pasa el publisher al handler de creación
 	createHandler := controllers.NewMax30102Controller(createUseCase, publisher)
 	viewHandler := controllers.GetAll30102Controller(viewUseCase)
 
@@ -27,7 +26,6 @@ func NewProductController(
 		viewAllProductsUseCase: viewHandler,
 	}
 }
-
 func (pc *ProductController) CreateProduct(c *gin.Context) {
 	pc.createProductUseCase.SaveMax30102Data(c)
 }

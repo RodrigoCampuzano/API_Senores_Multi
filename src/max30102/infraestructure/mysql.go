@@ -19,7 +19,6 @@ func NewMySQL() *MySQL {
 	return &MySQL{conn: conn}
 }
 
-// 🔹 Guardar un producto
 func (mysql *MySQL) Save(data *entities.Max30102) error {
 	query := `INSERT INTO max30102 (bpm, spo2) VALUES (?, ?)`
 	result, err := mysql.conn.DB.Exec(query, data.BPM, data.SpO2)
