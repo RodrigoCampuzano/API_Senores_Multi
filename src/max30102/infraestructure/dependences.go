@@ -28,6 +28,7 @@ func Init(r *gin.Engine) {
 	if err != nil {
 		log.Fatal("Error al conectar con RabbitMQ", err)
 	}
+	
 
 	publisher, err := broker.NewRabbitMQPublisher(conn, "Q1")
 	if err != nil {

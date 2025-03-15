@@ -21,18 +21,18 @@ func NewMySQL() *MySQL {
 
 // 🔹 Guardar un producto
 func (mysql *MySQL) Save(data *entities.Max30102) error {
-	query := `INSERT INTO products (nombre, precio, cantidad) VALUES (?, ?, ?)`
-	result, err := mysql.conn.DB.Exec(query, data)
+	query := `INSERT INTO max30102 (bpm, spo2) VALUES (?, ?)`
+	result, err := mysql.conn.DB.Exec(query, data.BPM, data.SpO2)
 	if err != nil {
 		log.Println("Error insertando producto:", err)
 		return err
 	}
 	lastID, err := result.LastInsertId()
 	if err != nil {
-		log.Println("Error obteniendo el ID del nuevo producto:", err)
+		log.Println("Error obteniendo el ID del nuevo dato:", err)
 		return err
 	}
-	fmt.Println("✅ Nuevo Producto creado con ID:", lastID)
+	fmt.Println("✅ Nuevo dato almacenado con ID:", lastID)
 	return nil
 }
 
