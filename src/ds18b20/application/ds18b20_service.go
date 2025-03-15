@@ -15,6 +15,6 @@ func NewDS18B20Service(ds18b20Repo repositories.DS18B20Repository) *Ds18b20Servi
     }
 }
 
-func (s *Ds18b20Service) SaveDS18B20Data(data *entities.DS18B20) error {
+func (s *Ds18b20Service) SaveDS18B20Data(data *ds_entities.DS18B20) error {
     return s.ds18b20Repo.Save(data)
 }

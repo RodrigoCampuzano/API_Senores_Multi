@@ -16,7 +16,7 @@ func NewDS18B20Controller(ds18b20Service *application.Ds18b20Service) *Ds18b20Co
 }
 
 func (c *Ds18b20Controller) SaveDS18B20Data(ctx *gin.Context) {
-    var data entities.DS18B20
+    var data ds_entities.DS18B20
     if err := ctx.ShouldBindJSON(&data); err != nil {
         ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
